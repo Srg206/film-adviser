@@ -1,27 +1,24 @@
 package main
 
 import (
+	"film-adviser/receiver"
+	"film-adviser/receiver/receiverbot"
 	"film-adviser/sender"
-	"film-adviser/sender/telegram"
-	"film-adviser/sender/web"
-	"film-adviser/settings"
-	"fmt"
+	"film-adviser/sender/senderbot"
+	"film-adviser/sender/senderweb"
 )
 
 func main() {
-
-	fmt.Println("From singleton token      " + settings.GetSettings().TgSenderToken)
-	var sender sender.Sender
-	sender = senderfabric()
-	sender.MustInit()
-
-	sender.Handle()
+	var receiver receiver.Receiver
+	receiver = receiverbot.New()
+	receiver.MustInit()
+	receiver.SendAnswer()
 
 }
 func senderfabric() sender.Sender {
 	if true {
-		return telegram.New()
+		return senderbot.New()
 	} else {
-		return web.New()
+		return senderweb.New()
 	}
 }

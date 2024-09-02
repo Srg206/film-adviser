@@ -1,4 +1,4 @@
-package telegram
+package senderbot
 
 import (
 	"film-adviser/repository"
