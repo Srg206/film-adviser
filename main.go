@@ -2,7 +2,7 @@ package main
 
 import (
 	"film-adviser/receiver"
-	"film-adviser/receiver/receiverbot"
+	"film-adviser/receiver/receiverweb"
 	"film-adviser/sender"
 	"film-adviser/sender/senderbot"
 	"film-adviser/sender/senderweb"
@@ -10,7 +10,7 @@ import (
 
 func main() {
 	var receiver receiver.Receiver
-	receiver = receiverbot.New()
+	receiver = receiverweb.New()
 	receiver.MustInit()
 	receiver.SendAnswer()
 
