@@ -1,6 +1,7 @@
 package receiverweb
 
 import (
+	"film-adviser/repository"
 	"net/http"
 	"strconv"
 
@@ -8,6 +9,7 @@ import (
 )
 
 type HttpServer struct {
+	repo *repository.Repository
 }
 
 type FilmToRecomend struct {
@@ -24,7 +26,7 @@ func (serv *HttpServer) MustInit() {
 
 }
 
-func (serv HttpServer) PickFilm(chatid int64) string {
+func (serv HttpServer) PickFilm(repo *repository.Repository, chatid int64) string {
 
 	return "Pulp fiction"
 }
@@ -34,7 +36,7 @@ func (serv HttpServer) SendAnswer() {
 	router.GET("/movie", func(c *gin.Context) {
 		chatID := c.Query("chatid")
 		id, _ := strconv.ParseInt(chatID, 10, 64)
-		response := FilmToRecomend{Name: serv.PickFilm(id)}
+		response := FilmToRecomend{Name: serv.PickFilm(serv.repo, id)}
 		c.JSON(http.StatusOK, response)
 	})
 	router.Run(":8080")

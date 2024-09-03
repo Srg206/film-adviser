@@ -29,7 +29,7 @@ func (rb *RecomendBot) MustInit() {
 		log.Fatal("Could not start sender bot!")
 	}
 }
-func (rb RecomendBot) PickFilm(chatid int64) string {
+func (rb RecomendBot) PickFilm(repo *repository.Repository, chatid int64) string {
 	return "Pulp fiction"
 }
 
@@ -58,7 +58,7 @@ func (rb RecomendBot) SendAnswer() {
 			if callbackData == "recomend_film" {
 				message := tu.Message(
 					tu.ID(chatID), // Используем правильный ID чата
-					rb.PickFilm(chatID),
+					rb.PickFilm(rb.repo, chatID),
 				).WithReplyMarkup(inlineKeyboard)
 
 				// Отправка сообщения

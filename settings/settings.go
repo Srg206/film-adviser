@@ -3,6 +3,7 @@ package settings
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/joho/godotenv"
@@ -12,6 +13,11 @@ import (
 type Settings struct {
 	TgSenderToken   string
 	TgReceiverToken string
+	PgIp            string
+	PgPort          int
+	PgDb            string
+	PgPass          string
+	PgUser          string
 }
 
 var instSettings *Settings
@@ -28,6 +34,12 @@ func GetSettings() *Settings {
 		instSettings = &Settings{}
 		instSettings.TgReceiverToken = os.Getenv("TG_RECEIVER_TOKEN")
 		instSettings.TgSenderToken = os.Getenv("TG_SENDER_TOKEN")
+		instSettings.PgIp = os.Getenv("POSTGRES_HOST")
+		instSettings.PgPort, _ = strconv.Atoi(os.Getenv("POSTGRES_PORT"))
+		instSettings.PgDb = os.Getenv("POSTGRES_DB")
+		instSettings.PgPass = os.Getenv("POSTGRES_PASSWORD")
+		instSettings.PgUser = os.Getenv("POSTGRES_USER")
+
 	})
 
 	return instSettings

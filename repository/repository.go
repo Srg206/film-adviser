@@ -1,6 +1,7 @@
 package repository
 
 type Repository interface {
-	Write() error
-	Read() error
+	MustInit()
+	Write(chatid int64, film string) error
+	PickRandom(chatid int64) (error, string)
 }

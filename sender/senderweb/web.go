@@ -1,6 +1,7 @@
 package senderweb
 
 import (
+	"film-adviser/repository"
 	"fmt"
 	"net/http"
 
@@ -17,7 +18,7 @@ type FilmToSave struct {
 func New() *HttpServer {
 	return &HttpServer{}
 }
-func (serv *HttpServer) MustInit() {
+func (serv *HttpServer) MustInit(repo repository.Repository) {
 
 }
 

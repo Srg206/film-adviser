@@ -1,0 +1,26 @@
+version: "3.7"
+services:
+  postgres:
+    container_name: fastapi-postgres-container
+    image: postgres:16.2
+    restart: unless-stopped
+    env_file:
+     - .env
+    environment:
+        TZ: 'GMT+3'
+        PGTZ: 'GMT+3'
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  
+  adminer:
+    container_name: fastapi-adminer-container
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - 8080:8080

@@ -11,17 +11,16 @@ import (
 )
 
 type SenderBot struct {
-	token   string
-	bot     *telego.Bot
-	repo    *repository.Repository
-	storage map[int64]string
+	token string
+	bot   *telego.Bot
+	repo  repository.Repository
 }
 
 func New() *SenderBot {
 	return &SenderBot{}
 }
 
-func (sb *SenderBot) MustInit() {
+func (sb *SenderBot) MustInit(repo repository.Repository) {
 	sb.token = settings.GetSettings().TgSenderToken
 	var err error
 	sb.bot, err = telego.NewBot(sb.token)
@@ -29,8 +28,8 @@ func (sb *SenderBot) MustInit() {
 		fmt.Println(err)
 		log.Fatal("Could not start sender bot!")
 	}
+	sb.repo = repo
 	//
-	sb.storage = make(map[int64]string)
 }
 
 func (sb SenderBot) Handle() error {
@@ -42,10 +41,9 @@ func (sb SenderBot) Handle() error {
 		var chatID int64 // ID чата
 
 		if update.Message != nil {
+			sb.repo.Write(update.Message.Chat.ID, update.Message.Text)
+
 			chatID = update.Message.Chat.ID
-			sb.storage[chatID] = update.Message.Text
-			fmt.Println(sb.storage)
-			// Сообщение
 			message := tu.Message(
 				tu.ID(chatID), // Используем правильный ID чата
 				"Фильм успешно сохранен",
