@@ -69,3 +69,7 @@ func (pg_rep *PostgresRepo) formdsn() {
 
 	pg_rep.dsn = fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%s sslmode=%s", pg_rep.ip, pg_rep.user, pg_rep.db_name, pg_rep.pass, strconv.Itoa(pg_rep.port), "disable")
 }
+
+func (pg_rep PostgresRepo) AddChatid(receiver_id, sender_id, user_id int64) {
+
+}

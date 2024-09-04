@@ -37,6 +37,9 @@ func (sb SenderBot) Handle() error {
 	defer sb.bot.StopLongPolling()
 
 	for update := range updates {
+		if update.Message != nil && update.Message.Text == "/start" {
+			//update.Message.From.ID
+		}
 		fmt.Println(update)
 		var chatID int64 // ID чата
 
@@ -61,3 +64,5 @@ func (sb SenderBot) Handle() error {
 	return nil
 
 }
+
+//func (sb SenderBot) add If

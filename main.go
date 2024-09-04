@@ -8,6 +8,7 @@ import (
 	"film-adviser/sender"
 	"film-adviser/sender/senderbot"
 	"film-adviser/sender/senderweb"
+	"sync"
 )
 
 func main() {
@@ -15,15 +16,30 @@ func main() {
 
 	storage.MustInit()
 
-	storagePtr := &storage // Получаем указатель на структуру
-
 	var sender sender.Sender
 	sender = senderfabric()
-	sender.MustInit(storagePtr)
-	sender.Handle()
+	sender.MustInit(&storage)
+
+	var receiver receiver.Receiver
+	receiver = receiverfabric()
+	receiver.MustInit(&storage)
+
+	var wg sync.WaitGroup
+
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		receiver.SendAnswer()
+	}()
+	go func() {
+		defer wg.Done()
+		sender.Handle()
+	}()
+	wg.Wait()
 }
 func senderfabric() sender.Sender {
-	if true {
+	if false {
 		return senderbot.New()
 	} else {
 		return senderweb.New()
@@ -31,7 +47,7 @@ func senderfabric() sender.Sender {
 }
 
 func receiverfabric() receiver.Receiver {
-	if true {
+	if false {
 		return receiverbot.New()
 	} else {
 		return receiverweb.New()

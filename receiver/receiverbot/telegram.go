@@ -13,14 +13,14 @@ import (
 type RecomendBot struct {
 	bot   *telego.Bot
 	token string
-	repo  *repository.Repository
+	repo  repository.Repository
 }
 
 func New() *RecomendBot {
 	return &RecomendBot{}
 }
 
-func (rb *RecomendBot) MustInit() {
+func (rb *RecomendBot) MustInit(repo repository.Repository) {
 	rb.token = settings.GetSettings().TgReceiverToken
 	var err error
 	rb.bot, err = telego.NewBot(rb.token)
@@ -28,9 +28,16 @@ func (rb *RecomendBot) MustInit() {
 		fmt.Println(err)
 		log.Fatal("Could not start sender bot!")
 	}
+	rb.repo = repo
 }
-func (rb RecomendBot) PickFilm(repo *repository.Repository, chatid int64) string {
-	return "Pulp fiction"
+func (rb RecomendBot) PickFilm(chatid int64) string {
+
+	if err, res := rb.repo.PickRandom(chatid); err == nil {
+		return res
+	} else {
+		fmt.Println("Could not pick film !")
+		return ""
+	}
 }
 
 func (rb RecomendBot) SendAnswer() {
@@ -58,7 +65,7 @@ func (rb RecomendBot) SendAnswer() {
 			if callbackData == "recomend_film" {
 				message := tu.Message(
 					tu.ID(chatID), // Используем правильный ID чата
-					rb.PickFilm(rb.repo, chatID),
+					rb.PickFilm(chatID),
 				).WithReplyMarkup(inlineKeyboard)
 
 				// Отправка сообщения

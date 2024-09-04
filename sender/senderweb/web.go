@@ -9,17 +9,19 @@ import (
 )
 
 type HttpServer struct {
+	repo repository.Repository
 }
 
 type FilmToSave struct {
-	Name string `json: "name"`
+	Chatid int64  `json: "chatid"`
+	Name   string `json: "name"`
 }
 
 func New() *HttpServer {
 	return &HttpServer{}
 }
 func (serv *HttpServer) MustInit(repo repository.Repository) {
-
+	serv.repo = repo
 }
 
 func (serv HttpServer) Handle() error {
@@ -35,6 +37,7 @@ func (serv HttpServer) Handle() error {
 		}
 		// Сохранение данных (в данном случае просто вывод в консоль)
 		fmt.Printf("Получены данные: %+v\n", film)
+		serv.repo.Write(film.Chatid, film.Name)
 		c.JSON(http.StatusOK, gin.H{"message": "Данные получены успешно"})
 	})
 	router.Run(":8000")
