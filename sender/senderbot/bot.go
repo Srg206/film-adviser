@@ -38,7 +38,6 @@ func (sb SenderBot) Handle() error {
 
 	for update := range updates {
 		// if update.Message.Text == "/start" {
-		// 	fmt.Println("nnnvnvjnvjnfjvnfvn\n\n\n\n\n\n\\n\n\nfjnvjfnvjfnvjfnvjfnvjfnv")
 		// 	sb.repo.AddChatid(0, update.Message.Chat.ID, update.Message.From.ID)
 		// 	continue
 		// }

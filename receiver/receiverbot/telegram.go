@@ -42,6 +42,7 @@ func (rb RecomendBot) PickFilm(chatid int64) string {
 }
 
 func (rb RecomendBot) SendAnswer() {
+	fmt.Println("m\n\n\n\n\n\nemgkmrkg\n\nm")
 	inlineKeyboard := tu.InlineKeyboard(
 		tu.InlineKeyboardRow( // Row 1
 			tu.InlineKeyboardButton("Порекомендуй фильм").
@@ -68,6 +69,13 @@ func (rb RecomendBot) SendAnswer() {
 
 		if update.Message != nil && update.Message.Text == "/start" {
 			rb.repo.AddChatid(update.Message.Chat.ID, 0, update.Message.From.ID)
+			message := tu.Message(
+				tu.ID(update.Message.Chat.ID), // Используем правильный ID чата
+				"Давайте порекомендую вам фильм",
+			).WithReplyMarkup(inlineKeyboard)
+
+			// Отправка сообщения
+			_, _ = rb.bot.SendMessage(message)
 			continue
 		}
 		var UserID int64 // ID чата

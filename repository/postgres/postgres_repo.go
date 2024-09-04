@@ -61,7 +61,7 @@ func (pg_rep PostgresRepo) Write(userid int64, film string) error {
 
 func (pg_rep PostgresRepo) PickRandom(userid int64) (error, string) {
 	var films []UsersFilms
-	if err := pg_rep.db.Where("UserId = ?", userid).Find(&films).Error; err != nil {
+	if err := pg_rep.db.Where("user_id = ?", userid).Find(&films).Error; err != nil {
 		fmt.Println("Error while reading films from postgres !")
 		return err, ""
 	}
@@ -78,7 +78,7 @@ func (pg_rep *PostgresRepo) formdsn() {
 func (pg_rep PostgresRepo) AddChatid(receiver_id, sender_id, user_id int64) error {
 
 	var user UsersId
-	if err := pg_rep.db.Where("UserId = ?", user_id).Find(&user).Error; err != nil {
+	if err := pg_rep.db.Where("user_id = ?", user_id).Find(&user).Error; err != nil {
 		fmt.Println("Error while reading user from postgres !")
 		return err
 	}
@@ -107,7 +107,7 @@ func (pg_rep PostgresRepo) AddChatid(receiver_id, sender_id, user_id int64) erro
 }
 func (pg_rep PostgresRepo) GetUserChat(user_id int64) (error, int64, int64) {
 	var user UsersId
-	if err := pg_rep.db.Where("UserId = ?", user_id).Find(&user).Error; err != nil {
+	if err := pg_rep.db.Where("user_id = ?", user_id).Find(&user).Error; err != nil {
 		fmt.Println("Error while reading user from postgres !")
 		return err, 0, 0
 	}

@@ -36,6 +36,7 @@ func main() {
 		sender.Handle()
 	}()
 	wg.Wait()
+
 }
 func senderfabric() sender.Sender {
 	return senderbot.New()
