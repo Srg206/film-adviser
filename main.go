@@ -7,7 +7,6 @@ import (
 	"film-adviser/repository/postgres"
 	"film-adviser/sender"
 	"film-adviser/sender/senderbot"
-	"film-adviser/sender/senderweb"
 	"sync"
 )
 
@@ -39,11 +38,7 @@ func main() {
 	wg.Wait()
 }
 func senderfabric() sender.Sender {
-	if false {
-		return senderbot.New()
-	} else {
-		return senderweb.New()
-	}
+	return senderbot.New()
 }
 
 func receiverfabric() receiver.Receiver {
