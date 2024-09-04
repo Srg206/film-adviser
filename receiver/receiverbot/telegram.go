@@ -5,6 +5,7 @@ import (
 	"film-adviser/settings"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/mymmrac/telego"
 	tu "github.com/mymmrac/telego/telegoutil"
@@ -47,16 +48,37 @@ func (rb RecomendBot) SendAnswer() {
 				WithCallbackData("recomend_film"),
 		),
 	)
+
+	StartTime := time.Now().Unix()
 	updates, _ := rb.bot.UpdatesViaLongPolling(nil)
 	defer rb.bot.StopLongPolling()
 
 	for update := range updates {
-		var chatID int64 // ID чата
-
+		var updateTime int64
 		if update.Message != nil {
-			chatID = update.Message.Chat.ID
+			updateTime = update.Message.GetDate()
+		}
+		if update.CallbackQuery != nil {
+			updateTime = update.CallbackQuery.Message.GetDate()
+		}
+
+		if updateTime < StartTime {
+			continue
+		}
+
+		if update.Message != nil && update.Message.Text == "/start" {
+			rb.repo.AddChatid(update.Message.Chat.ID, 0, update.Message.From.ID)
+			continue
+		}
+		var UserID int64 // ID чата
+		var chatID int64
+		if update.Message != nil {
+			UserID = update.Message.From.ID
+			_, chatID, _ = rb.repo.GetUserChat(UserID)
 		} else if update.CallbackQuery != nil {
-			chatID = update.CallbackQuery.Message.GetChat().ID
+			UserID = update.CallbackQuery.From.ID
+			_, chatID, _ = rb.repo.GetUserChat(UserID)
+
 		} else {
 			continue
 		}

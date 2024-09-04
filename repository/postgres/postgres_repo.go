@@ -42,11 +42,16 @@ func (pg_rep *PostgresRepo) MustInit() {
 	if err != nil {
 		log.Fatal("Could not connect to postgres !")
 	}
+	_ = pg_rep.db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s;", "users_ids"))
+	_ = pg_rep.db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s;", "users_films"))
+
 	pg_rep.db.AutoMigrate(&UsersFilms{})
+	pg_rep.db.AutoMigrate(&UsersId{})
+
 }
 
-func (pg_rep PostgresRepo) Write(chatid int64, film string) error {
-	new_film := UsersFilms{Chatid: chatid, Film: film}
+func (pg_rep PostgresRepo) Write(userid int64, film string) error {
+	new_film := UsersFilms{UserId: userid, Film: film}
 	err := pg_rep.db.Create(&new_film).Error
 	if err != nil {
 		fmt.Println("Error while writing new film from postgres !")
@@ -54,9 +59,9 @@ func (pg_rep PostgresRepo) Write(chatid int64, film string) error {
 	return err
 }
 
-func (pg_rep PostgresRepo) PickRandom(chatid int64) (error, string) {
+func (pg_rep PostgresRepo) PickRandom(userid int64) (error, string) {
 	var films []UsersFilms
-	if err := pg_rep.db.Where("Chatid = ?", chatid).Find(&films).Error; err != nil {
+	if err := pg_rep.db.Where("UserId = ?", userid).Find(&films).Error; err != nil {
 		fmt.Println("Error while reading films from postgres !")
 		return err, ""
 	}
@@ -70,6 +75,41 @@ func (pg_rep *PostgresRepo) formdsn() {
 	pg_rep.dsn = fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%s sslmode=%s", pg_rep.ip, pg_rep.user, pg_rep.db_name, pg_rep.pass, strconv.Itoa(pg_rep.port), "disable")
 }
 
-func (pg_rep PostgresRepo) AddChatid(receiver_id, sender_id, user_id int64) {
+func (pg_rep PostgresRepo) AddChatid(receiver_id, sender_id, user_id int64) error {
 
+	var user UsersId
+	if err := pg_rep.db.Where("UserId = ?", user_id).Find(&user).Error; err != nil {
+		fmt.Println("Error while reading user from postgres !")
+		return err
+	}
+	if user.ID == 0 {
+		fmt.Println("No user found with the specified ID.")
+		new_user := UsersId{UserId: user_id, SenderId: sender_id, ReceiverId: receiver_id}
+		err := pg_rep.db.Create(&new_user).Error
+		if err != nil {
+			fmt.Println("Error while writing new film from postgres !")
+		}
+		return err
+	}
+	if receiver_id != 0 {
+		user.ReceiverId = receiver_id
+	}
+	if sender_id != 0 {
+		user.SenderId = sender_id
+	}
+
+	if err := pg_rep.db.Save(&user).Error; err != nil {
+		fmt.Println("Error while updating Id in Postgres:", err)
+		return err
+	}
+
+	return nil
+}
+func (pg_rep PostgresRepo) GetUserChat(user_id int64) (error, int64, int64) {
+	var user UsersId
+	if err := pg_rep.db.Where("UserId = ?", user_id).Find(&user).Error; err != nil {
+		fmt.Println("Error while reading user from postgres !")
+		return err, 0, 0
+	}
+	return nil, user.ReceiverId, user.SenderId
 }

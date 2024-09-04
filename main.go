@@ -42,7 +42,7 @@ func senderfabric() sender.Sender {
 }
 
 func receiverfabric() receiver.Receiver {
-	if false {
+	if true {
 		return receiverbot.New()
 	} else {
 		return receiverweb.New()

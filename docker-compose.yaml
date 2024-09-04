@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   postgres:
-    container_name: fastapi-postgres-container
+    container_name: postgres-container
     image: postgres:16.2
     restart: unless-stopped
     env_file:
@@ -19,7 +19,7 @@ services:
       start_period: 10s
   
   adminer:
-    container_name: fastapi-adminer-container
+    container_name: adminer-container
     image: adminer:latest
     restart: unless-stopped
     ports:

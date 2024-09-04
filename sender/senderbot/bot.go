@@ -37,14 +37,18 @@ func (sb SenderBot) Handle() error {
 	defer sb.bot.StopLongPolling()
 
 	for update := range updates {
-		if update.Message != nil && update.Message.Text == "/start" {
-			//update.Message.From.ID
-		}
+		// if update.Message.Text == "/start" {
+		// 	fmt.Println("nnnvnvjnvjnfjvnfvn\n\n\n\n\n\n\\n\n\nfjnvjfnvjfnvjfnvjfnvjfnv")
+		// 	sb.repo.AddChatid(0, update.Message.Chat.ID, update.Message.From.ID)
+		// 	continue
+		// }
+		sb.repo.AddChatid(0, update.Message.Chat.ID, update.Message.From.ID)
+
 		fmt.Println(update)
 		var chatID int64 // ID чата
 
 		if update.Message != nil {
-			sb.repo.Write(update.Message.Chat.ID, update.Message.Text)
+			sb.repo.Write(update.Message.From.ID, update.Message.Text)
 
 			chatID = update.Message.Chat.ID
 			message := tu.Message(
