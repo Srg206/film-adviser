@@ -42,7 +42,6 @@ func (rb RecomendBot) PickFilm(chatid int64) string {
 }
 
 func (rb RecomendBot) SendAnswer() {
-	fmt.Println("m\n\n\n\n\n\nemgkmrkg\n\nm")
 	inlineKeyboard := tu.InlineKeyboard(
 		tu.InlineKeyboardRow( // Row 1
 			tu.InlineKeyboardButton("Порекомендуй фильм").

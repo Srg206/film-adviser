@@ -63,7 +63,11 @@ func (pg_rep PostgresRepo) PickRandom(userid int64) (error, string) {
 	var films []UsersFilms
 	if err := pg_rep.db.Where("user_id = ?", userid).Find(&films).Error; err != nil {
 		fmt.Println("Error while reading films from postgres !")
-		return err, ""
+		return err, "You haven`t saved films yet"
+	}
+	if len(films) == 0 {
+		return nil, "You haven`t saved films yet"
+
 	}
 	ind := rand.Intn(len(films))
 
