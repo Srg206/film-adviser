@@ -34,7 +34,9 @@ func (sb *SaverBot) MustInit(repo repository.Repository) {
 
 // func to start saver bot
 func (sb SaverBot) Handle() error {
-	updates, _ := sb.bot.UpdatesViaLongPolling(nil)
+	updates, _ := sb.bot.UpdatesViaLongPolling(&telego.GetUpdatesParams{
+		Timeout: 60,
+	})
 	defer sb.bot.StopLongPolling()
 
 	for update := range updates {
@@ -48,15 +50,15 @@ func (sb SaverBot) Handle() error {
 		var chatID int64
 
 		if update.Message != nil {
-			sb.repo.Write(update.Message.From.ID, update.Message.Text)
+			if sb.repo.Write(update.Message.From.ID, update.Message.Text) == nil {
+				chatID = update.Message.Chat.ID
+				message := tu.Message(
+					tu.ID(chatID),
+					"Film saved successfully",
+				)
 
-			chatID = update.Message.Chat.ID
-			message := tu.Message(
-				tu.ID(chatID),
-				"Film saved successfully",
-			)
-
-			_, _ = sb.bot.SendMessage(message)
+				_, _ = sb.bot.SendMessage(message)
+			}
 		} else if update.CallbackQuery != nil {
 			chatID = update.CallbackQuery.Message.GetChat().ID
 		} else {

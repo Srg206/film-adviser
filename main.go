@@ -11,7 +11,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"sync"
 )
 
 func main() {
@@ -32,18 +31,20 @@ func main() {
 	reminder.MustInit(&storage)
 
 	// start saver and reminder in 2 goroutines
-	var wg sync.WaitGroup
-	wg.Add(2)
+	saver.Handle()
 
-	go func() {
-		defer wg.Done()
-		reminder.SendAnswer()
-	}()
-	go func() {
-		defer wg.Done()
-		saver.Handle()
-	}()
-	wg.Wait()
+	// var wg sync.WaitGroup
+	// wg.Add(2)
+
+	// go func() {
+	// 	defer wg.Done()
+	// 	reminder.SendAnswer()
+	// }()
+	// go func() {
+	// 	defer wg.Done()
+	// 	saver.Handle()
+	// }()
+	// wg.Wait()
 
 }
 
