@@ -11,8 +11,8 @@ import (
 
 // Struct that contains settings
 type Settings struct {
-	TgSenderToken   string
-	TgReceiverToken string
+	TgSaverToken    string
+	TgReminderToken string
 	PgIp            string
 	PgPort          int
 	PgDb            string
@@ -23,7 +23,7 @@ type Settings struct {
 var instSettings *Settings
 var once sync.Once
 
-// GetSettings is a func to get settings instance
+// GetSettings is a func to get settings instance (Settings is a Singleton)
 func GetSettings() *Settings {
 
 	once.Do(func() {
@@ -32,8 +32,8 @@ func GetSettings() *Settings {
 			fmt.Println("Could not load .env file !")
 		}
 		instSettings = &Settings{}
-		instSettings.TgReceiverToken = os.Getenv("TG_RECEIVER_TOKEN")
-		instSettings.TgSenderToken = os.Getenv("TG_SENDER_TOKEN")
+		instSettings.TgReminderToken = os.Getenv("TG_REMINDER_TOKEN")
+		instSettings.TgSaverToken = os.Getenv("TG_SAVER_TOKEN")
 		instSettings.PgIp = os.Getenv("POSTGRES_HOST")
 		instSettings.PgPort, _ = strconv.Atoi(os.Getenv("POSTGRES_PORT"))
 		instSettings.PgDb = os.Getenv("POSTGRES_DB")

@@ -1,18 +1,17 @@
-# Указываем базовый образ
+# Image to compile source code
 FROM golang:1.23 AS builder
 
 WORKDIR /app
 
 COPY go.mod go.sum ./
-RUN go mod tidy
-RUN go mod download
+RUN go mod tidy & go mod download
 
 COPY . .
 
-RUN GOOS=linux GOARCH=amd64 go build -o myapp main.go
+RUN  go build -o myapp main.go
 
 
-# Создаем финальный образ
+# Final image to execute binary file
 FROM golang:1.23
 WORKDIR /srg
 
@@ -20,4 +19,3 @@ COPY --from=builder /app/myapp .
 COPY --from=builder /app/.env .
 COPY --from=builder /app/configs.txt .
 CMD ["./myapp"]
-#CMD ["sh"]

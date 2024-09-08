@@ -8,6 +8,7 @@ type UsersFilms struct {
 	Film   string
 }
 
+// table to link telegram user id with chat`s id
 type UsersId struct {
 	gorm.Model
 	UserId     int64

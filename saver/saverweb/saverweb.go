@@ -1,4 +1,4 @@
-package senderweb
+package saverweb
 
 import (
 	"film-adviser/repository"
@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type HttpServer struct {
+type HttpSaver struct {
 	repo repository.Repository
 }
 
@@ -17,28 +17,28 @@ type FilmToSave struct {
 	Name   string `json: "name"`
 }
 
-func New() *HttpServer {
-	return &HttpServer{}
+func New() HttpSaver {
+	return HttpSaver{}
 }
-func (serv *HttpServer) MustInit(repo repository.Repository) {
+func (serv HttpSaver) MustInit(repo repository.Repository) {
 	serv.repo = repo
 }
 
-func (serv HttpServer) Handle() error {
+func (serv HttpSaver) Handle() error {
 
 	router := gin.Default()
 
 	router.POST("/movie", func(c *gin.Context) {
 		var film FilmToSave
-		// Декодирование JSON из тела запроса
+		// Decode json from request body
 		if err := c.BindJSON(&film); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		// Сохранение данных (в данном случае просто вывод в консоль)
-		fmt.Printf("Получены данные: %+v\n", film)
+
+		fmt.Printf("Received data: %+v\n", film)
 		serv.repo.Write(film.Userid, film.Name)
-		c.JSON(http.StatusOK, gin.H{"message": "Данные получены успешно"})
+		c.JSON(http.StatusOK, gin.H{"message": "Data received successully"})
 	})
 	router.Run(":8000")
 	return nil

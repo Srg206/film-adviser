@@ -1,4 +1,4 @@
-package receiverweb
+package reminderweb
 
 import (
 	"film-adviser/repository"
@@ -31,9 +31,10 @@ func (serv HttpServer) PickFilm(chatid int64) string {
 	return res
 }
 
+// func to run server
 func (serv HttpServer) SendAnswer() {
 	router := gin.Default()
-	router.GET("/movie", func(c *gin.Context) {
+	router.GET("/film", func(c *gin.Context) {
 		chatID := c.Query("chatid")
 		id, _ := strconv.ParseInt(chatID, 10, 64)
 		response := FilmToRecomend{Name: serv.PickFilm(id)}

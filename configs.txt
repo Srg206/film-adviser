@@ -1,2 +1,2 @@
-sender bot
-receiver bot
+saver bot
+reminder bot

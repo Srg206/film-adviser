@@ -1,4 +1,4 @@
-package receiverbot
+package reminderbot
 
 import (
 	"film-adviser/repository"
@@ -22,7 +22,7 @@ func New() *RecomendBot {
 }
 
 func (rb *RecomendBot) MustInit(repo repository.Repository) {
-	rb.token = settings.GetSettings().TgReceiverToken
+	rb.token = settings.GetSettings().TgReminderToken
 	var err error
 	rb.bot, err = telego.NewBot(rb.token)
 	if err != nil {
@@ -31,6 +31,7 @@ func (rb *RecomendBot) MustInit(repo repository.Repository) {
 	}
 	rb.repo = repo
 }
+
 func (rb RecomendBot) PickFilm(chatid int64) string {
 
 	if err, res := rb.repo.PickRandom(chatid); err == nil {
@@ -42,18 +43,14 @@ func (rb RecomendBot) PickFilm(chatid int64) string {
 }
 
 func (rb RecomendBot) SendAnswer() {
-	inlineKeyboard := tu.InlineKeyboard(
-		tu.InlineKeyboardRow( // Row 1
-			tu.InlineKeyboardButton("Порекомендуй фильм").
-				WithCallbackData("recomend_film"),
-		),
-	)
-
 	StartTime := time.Now().Unix()
-	updates, _ := rb.bot.UpdatesViaLongPolling(nil)
+	updates, _ := rb.bot.UpdatesViaLongPolling(&telego.GetUpdatesParams{
+		Timeout: 1,
+	})
 	defer rb.bot.StopLongPolling()
 
 	for update := range updates {
+		// check time in order to do not process old updates
 		var updateTime int64
 		if update.Message != nil {
 			updateTime = update.Message.GetDate()
@@ -66,18 +63,20 @@ func (rb RecomendBot) SendAnswer() {
 			continue
 		}
 
+		// process start
 		if update.Message != nil && update.Message.Text == "/start" {
 			rb.repo.AddChatid(update.Message.Chat.ID, 0, update.Message.From.ID)
 			message := tu.Message(
-				tu.ID(update.Message.Chat.ID), // Используем правильный ID чата
-				"Давайте порекомендую вам фильм",
+				tu.ID(update.Message.Chat.ID),
+				"Let me remind you of the film",
 			).WithReplyMarkup(inlineKeyboard)
 
-			// Отправка сообщения
 			_, _ = rb.bot.SendMessage(message)
 			continue
 		}
-		var UserID int64 // ID чата
+
+		// define user id
+		var UserID int64
 		var chatID int64
 		if update.Message != nil {
 			UserID = update.Message.From.ID
@@ -89,24 +88,24 @@ func (rb RecomendBot) SendAnswer() {
 		} else {
 			continue
 		}
+
+		// process clicking remind_film
 		if update.CallbackQuery != nil {
 			callbackData := update.CallbackQuery.Data
-			if callbackData == "recomend_film" {
+			if callbackData == "remind_film" {
 				message := tu.Message(
-					tu.ID(chatID), // Используем правильный ID чата
+					tu.ID(chatID),
 					rb.PickFilm(chatID),
 				).WithReplyMarkup(inlineKeyboard)
 
-				// Отправка сообщения
 				_, _ = rb.bot.SendMessage(message)
 			}
 		} else {
 			message := tu.Message(
-				tu.ID(chatID), // Используем правильный ID чата
-				"Давайте порекомендую вам фильм",
+				tu.ID(chatID),
+				"Let me remind you of the film",
 			).WithReplyMarkup(inlineKeyboard)
 
-			// Отправка сообщения
 			_, _ = rb.bot.SendMessage(message)
 		}
 

@@ -2,13 +2,12 @@ package main
 
 import (
 	"bufio"
-	"film-adviser/receiver"
-	"film-adviser/receiver/receiverbot"
-	"film-adviser/receiver/receiverweb"
+	"film-adviser/reminder"
+	"film-adviser/reminder/reminderbot"
+	"film-adviser/reminder/reminderweb"
 	"film-adviser/repository/postgres"
-	"film-adviser/sender"
-	"film-adviser/sender/senderbot"
-	"film-adviser/sender/senderweb"
+	"film-adviser/saver"
+	"film-adviser/saver/saverbot"
 	"log"
 	"os"
 	"strings"
@@ -16,49 +15,52 @@ import (
 )
 
 func main() {
-	send_interface, receive_interface := loadconfigs()
+	save_interface, remind_interface := loadconfigs() // read configs.txt and choose way to save and remind films (bot or web)
 
+	// create and initialise way to story data
 	var storage postgres.PostgresRepo
-
 	storage.MustInit()
 
-	var sender sender.Sender
-	sender = senderfabric(send_interface)
-	sender.MustInit(&storage)
+	// create saver which type we get from configs.txt
+	var saver saver.Saver
+	saver = senderfabric(save_interface)
+	saver.MustInit(&storage)
 
-	var receiver receiver.Receiver
-	receiver = receiverfabric(receive_interface)
-	receiver.MustInit(&storage)
+	// create reminder which type we get from configs.txt
+	var reminder reminder.Reminder
+	reminder = receiverfabric(remind_interface)
+	reminder.MustInit(&storage)
 
+	// start saver and reminder in 2 goroutines
 	var wg sync.WaitGroup
-
 	wg.Add(2)
 
 	go func() {
 		defer wg.Done()
-		receiver.SendAnswer()
+		reminder.SendAnswer()
 	}()
 	go func() {
 		defer wg.Done()
-		sender.Handle()
+		saver.Handle()
 	}()
 	wg.Wait()
 
 }
-func senderfabric(config string) sender.Sender {
+
+// func which return certain type of saver(bot or web )
+func senderfabric(config string) saver.Saver {
 	if config == "bot" {
-		return senderbot.New()
-	} else {
-		return senderweb.New()
+		return saverbot.New()
 	}
+	return saverbot.New()
 }
 
-func receiverfabric(config string) receiver.Receiver {
+// func which return certain type of reminder(bot or web)
+func receiverfabric(config string) reminder.Reminder {
 	if config == "web" {
-		return receiverweb.New()
-	} else {
-		return receiverbot.New()
+		return reminderweb.New()
 	}
+	return reminderbot.New()
 }
 
 func loadconfigs() (string, string) {
